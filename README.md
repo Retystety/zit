@@ -1,1 +1,1 @@
-WIP WASM interpreter designed around around x86.
+WIP WASM interpreter designed around x86.
