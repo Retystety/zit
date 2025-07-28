@@ -1,30 +1,30 @@
 const Config = @import("Config.zig");
 const inst = @import("inst.zig");
 const Opcode = inst.Opcode;
-const eoc = inst.Opcode;
+const DTable = inst.DTable;
 const Memory =  @import("memory.zig").Memory;
 
 pub fn State(config: Config = Config .{}) type {
     return struct {
         const State = @This();
 
+        const UInt = config.UInt();
         const Float = config.Float();
         const Double = config.Double();
 
         pub const Op = *const fn (state: State) Result;
-        
-        
+           
         pub const Static = struct {
             globals: []u8,
-            stack_low: usize,
-            stack_high: usize,
+            stack_bgn: usize,
+            stack_end: usize,
             memory: Memory(config),
-            dtable: [*]usize,
+            dtable: DTable,
         };
         
         ra: UInt = 0,
         rb: UInt = 0,
-        rc: UInt = 0,
+        rr: UInt = 0,
 
         fa: Float = 0,
         fb: Float = 0,
@@ -40,14 +40,15 @@ pub fn State(config: Config = Config .{}) type {
         static: *Static,
         
         pub const ResultType = enum {
-            sentinel,
-            halt,
-            breakpoint,
+            _sentinel,
+            _breakpoint,
+            
+            _unreachable,
 
-            stack_underflow,
-            stack_overflow,
+            _stack_underflow,
+            _stack_overflow,
         
-            div_by_zero,
+            _div_by_zero,
         };
         
         pub const Result = struct {
@@ -89,7 +90,7 @@ pub fn State(config: Config = Config .{}) type {
             };
         }
 
-        pub fn init(code: [:eoc]const Opcode, stack: []align(config.alignOf() u8), memory: Memory(Config), dtable: [*]usize) State {};
+        pub fn init(code: []const Opcode, stack: []align(config.alignOf(UInt) u8), memory: Memory(Config), dtable: [*]usize) State {};
 
         pub inline fn ld(state: *const State, ptr: UInt, T: type) T {
             return state.static.memory.ld(ptr, T);
@@ -106,29 +107,39 @@ pub fn State(config: Config = Config .{}) type {
 
         pub inline fn pop(state: *State, len: usize) stackErr!void {
             const sp = state.sp -| len;
-            if (sp <= state.static.stack_low) return stackErr.underflow;
+            if (sp <= state.static.stack_bgn) return stackErr.underflow;
             state.sp = sp;
         }
 
         pub inline fn push(state: *State, len: usize) stackErr!void {
             const sp = state.sp +| len;
-            if (sp >= state.static.stack_high) return stackErr.overflow;
+            if (sp >= state.static.stack_endlow) return stackErr.overflow;
             state.sp = sp;
         }
 
-        pub inline fn lGet(state: *const State, ptr: UInt, T: type) T {
-            return state.static.memory.ld(ptr, T);
+        pub inline fn get(state: *const State, ptr: UInt, T: type) T {
+            const ptr: *const T = @ptrFromInt(ptr); 
+            return ptr.*;
+        }
+
+        pub inline fn set(state: *const State, ptr: UInt, val: anyopaque) void {
+            const ptr: *T = @ptrFromInt(ptr);
+            ptr.* = val;
         }
         
-        pub inline fn lSet(state: *const State, ptr: UInt, val: UInt) void {
-            return state.static.memory.st(ptr, val);
+        pub inline fn lGet(state: *const State, off: UInt, T: type) T {
+            return state.get(state.sp - off, T); 
+        }
+        
+        pub inline fn lSet(state: *const State, off: UInt, val: anyopaque) void {
+            state.set(state.sp + off, val);
         }
 
         pub inline fn gGet(state: *const State, ptr: UInt, T: type) T {
             return state.static.memory.ld(ptr, T);
         }
         
-        pub inline fn gSet(state: *const State, ptr: UInt, val: UInt) void {
+        pub inline fn gSet(state: *const State, ptr: UInt, val: anyopaque) void {
             return state.static.memory.st(ptr, val);
         }
     };
