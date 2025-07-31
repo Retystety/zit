@@ -1,9 +1,7 @@
 const Config = @This();
 
-const Width = enum {
-    x32,
-    x64,    
-}
+const width = @import("width.zig");
+const Width = width.Width;
 
 width: Width = .x32,
 float: bool = false,
@@ -11,34 +9,21 @@ simd: bool = false,
 atomic: bool = false,
 
 min_mem_size: u16 = 1,
-max_mem_size: u16 = 0,
-   
-pub fn UInt(config: *const Config) type {
-    return switch (config.width) {
-        .x32 => u32,
-        .x64 => u64,  
-    };
+max_mem_size: u16 = 0, // 0 == inf
+
+pub fn UWord(config: *const Config) type {
+    return width.UInt(config.width);    
 }
 
-pub fn alignOf(config: *const Config) type {
-    return switch (config.width) {
-        .x32 => @alignOf(u32),
-        .x64 => @alignOf(u64),  
-    };
+pub fn SWord(config: *const Config) type {
+    return width.SInt(config.width);
 }
-
-pub fn SInt(config: *const Config) type {
-    return switch (config.width) {
-        .x32 => i32,
-        .x64 => i64,  
-    };
-}  
 
 pub fn Float(config: *const Config) type {
     if (config.float) f32 else void;
 }
 
-pub fn Double(config: *const Config) type {
+pub fn Double(config: Config) type {
     return if (config.float)
         switch (config.width) {
             .x32 => void,

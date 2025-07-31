@@ -12,13 +12,16 @@ pub fn Memory(config: Config = Config .{}) type {
         pages: std.SegmentedList(Page, config.min_mem_size),
         allocator: Allocator,
 
-        pub fn init() Memory {};
-        pub fn dinit() void {};
+        pub fn init() Memory {}
+        pub fn dinit() void {}
 
-        pub fn ld() T {};
-        pub fn st() !void {};
+        pub fn ld() T {}
+        pub fn st() !void {}
 
-        pub fn grow() !void {};
-        pub fn shrink() !void {};
+        pub fn grow() !void {}
+        pub fn shrink() !void {}
+
+        pub fn memset() !void {}
+        pub fn memcpy() !void {}
     };
 }

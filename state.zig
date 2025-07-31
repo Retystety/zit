@@ -8,9 +8,9 @@ pub fn State(config: Config = Config .{}) type {
     return struct {
         const State = @This();
 
-        const UInt = config.UInt();
-        const Float = config.Float();
-        const Double = config.Double();
+        const UWord = Config.UWord(config.width);
+        const Float = Config.Float(config.float);
+        const Double = Config.Double(config.float, config.width);
 
         pub const Op = *const fn (state: State) Result;
            
@@ -20,11 +20,13 @@ pub fn State(config: Config = Config .{}) type {
             stack_end: usize,
             memory: Memory(config),
             dtable: DTable,
+            fn_table: []UWord,
+            jmp_table: []UWord,
         };
         
-        ra: UInt = 0,
-        rb: UInt = 0,
-        rr: UInt = 0,
+        ra: UWord = 0,
+        rb: UWord = 0,
+        rc: UWord = 0,
 
         fa: Float = 0,
         fb: Float = 0,
@@ -57,9 +59,9 @@ pub fn State(config: Config = Config .{}) type {
             
             ip: IPtr,
             
-            ra: UInt,
-            rb: UInt,
-            rc: UInt,
+            ra: UWord,
+            rb: UWord,
+            rc: UWord,
 
             fa: Float,
             fb: Float,
@@ -90,13 +92,13 @@ pub fn State(config: Config = Config .{}) type {
             };
         }
 
-        pub fn init(code: []const Opcode, stack: []align(config.alignOf(UInt) u8), memory: Memory(Config), dtable: [*]usize) State {};
+        pub fn init(code: []const Opcode, stack: []align(config.alignOf(UWord) u8), memory: Memory(Config), dtable: [*]usize) State {};
 
-        pub inline fn ld(state: *const State, ptr: UInt, T: type) T {
+        pub inline fn ld(state: *const State, ptr: UWord, T: type) T {
             return state.static.memory.ld(ptr, T);
         }
         
-        pub inline fn st(state: *const State, ptr: UInt, val: UInt) void {
+        pub inline fn st(state: *const State, ptr: UWord, val: UWord) void {
             return state.static.memory.st(ptr, val);
         }
 
@@ -117,29 +119,29 @@ pub fn State(config: Config = Config .{}) type {
             state.sp = sp;
         }
 
-        pub inline fn get(state: *const State, ptr: UInt, T: type) T {
+        pub inline fn get(state: *const State, ptr: UWord, T: type) T {
             const ptr: *const T = @ptrFromInt(ptr); 
             return ptr.*;
         }
 
-        pub inline fn set(state: *const State, ptr: UInt, val: anyopaque) void {
+        pub inline fn set(state: *const State, ptr: UWord, val: anyopaque) void {
             const ptr: *T = @ptrFromInt(ptr);
             ptr.* = val;
         }
         
-        pub inline fn lGet(state: *const State, off: UInt, T: type) T {
+        pub inline fn lGet(state: *const State, off: UWord, T: type) T {
             return state.get(state.sp - off, T); 
         }
         
-        pub inline fn lSet(state: *const State, off: UInt, val: anyopaque) void {
-            state.set(state.sp + off, val);
+        pub inline fn lSet(state: *const State, off: UWord, val: anyopaque) void {
+            state.set(state.sp - off, val);
         }
 
-        pub inline fn gGet(state: *const State, ptr: UInt, T: type) T {
+        pub inline fn gGet(state: *const State, ptr: UWord, T: type) T {
             return state.static.memory.ld(ptr, T);
         }
         
-        pub inline fn gSet(state: *const State, ptr: UInt, val: anyopaque) void {
+        pub inline fn gSet(state: *const State, ptr: UWord, val: anyopaque) void {
             return state.static.memory.st(ptr, val);
         }
     };
