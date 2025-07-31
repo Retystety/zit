@@ -2,7 +2,7 @@ const Config = @import("../Config.zig");
 const inst = @import("inst.zig");
 const END = inst.END;
 
-pub fn Base(config: Config) type {
+pub fn Base(config: Config) type { return struct {
     const State = @import("../state.zig").State(Config);
     const Result = State.Result;
 
@@ -12,6 +12,10 @@ pub fn Base(config: Config) type {
 
     pub fn _breakepoint(state: State) Result {
         return state.result(._breakpoint);
+    }
+
+    pub fn _unreachable(state: State) Result {
+            return state.result(._unreachable);
     }
 
     pub fn _mvRA(state: State) Result {
@@ -45,4 +49,4 @@ pub fn Base(config: Config) type {
         new.rr = new.rb;
         return END(new);
     }
-}
+};}
