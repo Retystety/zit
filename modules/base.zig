@@ -18,15 +18,15 @@ pub fn Base(config: Config) type { return struct {
             return state.result(._unreachable);
     }
 
-    pub fn _mvRA(state: State) Result {
+    pub fn _mvCA(state: State) Result {
         var new = state;
-        new.ra = new.rr;
+        new.ra = new.rc;
         return END(new);
     }
 
-    pub fn _mvRB(state: State) Result {
+    pub fn _mvCB(state: State) Result {
         var new = state;
-        new.rb = new.rr;
+        new.rb = new.rc;
         return END(new);
     }
 
@@ -38,15 +38,15 @@ pub fn Base(config: Config) type { return struct {
         return END(new);
     }
 
-    pub fn _mvAR(state: State) Result {
+    pub fn _mvAC(state: State) Result {
         var new = state;
-        new.rr = new.ra;
+        new.rc = new.ra;
         return END(new);
     }
 
-    pub fn _mvBR(state: State) Result {
+    pub fn _mvBC(state: State) Result {
         var new = state;
-        new.rr = new.rb;
+        new.rc = new.rb;
         return END(new);
     }
 };}
