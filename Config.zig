@@ -3,9 +3,6 @@ const Config = @This();
 const width = @import("width.zig");
 const Width = width.Width;
 
-const Module = @import("Module.zig");
-
-
 width: Width = .x32,
 float: bool = false,
 simd: bool = false,
