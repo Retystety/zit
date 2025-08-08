@@ -8,8 +8,8 @@ const END = inst.END;
 
 pub fn Int(config: Config, size: width.Width) type { return struct {
 
-    pub const module = Module { .prefix = "i" ++ width.prefix(size) ++ "_", 
-        .instrs = [_]const Inst {
+    pub const module = try Module.init("i" ++ width.prefix(size) ++ "_", 
+        [_]const Inst {
             Inst.init("const" _const);
 
             Inst.init("getA", _getA);
@@ -51,7 +51,7 @@ pub fn Int(config: Config, size: width.Width) type { return struct {
             Inst.init("rem_u", _rem_u);
             Inst.init("rem_s", _rem_s);
         },
-    };
+    );
 
     const Word = Config.UInt(config.width);
     const UInt = Config.UInt(size);

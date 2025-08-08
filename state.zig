@@ -42,9 +42,10 @@ pub fn State(config: Config) type {
         static: *Static,
         
         pub const ResultType = enum {
+            _illegal,
             _sentinel,
-            _breakpoint,
             
+            _breakpoint,
             _unreachable,
 
             _stack_underflow,

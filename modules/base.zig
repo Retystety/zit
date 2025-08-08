@@ -8,12 +8,16 @@ const State = @import("../state.zig").State(Config);
 const Result = State.Result;
 
 
-pub const module = Module { .prefix = "",  
+pub const module = try Module.init(prefix = "",  
     .instrs = [_]const Inst {
         Inst.init("nop", _nop);
+        
+        Inst.init("illegal", _illegal);
         Inst.init("sentinel", _sentinel);
+        
         Inst.init("breakepoint", _breakepoint);
         Inst.init("unreachable", _unreachable);
+        
         Inst.init("mvCA", _mvCA);
         Inst.init("mvCB", _mvCB);
         Inst.init("swp", _swp);
@@ -21,10 +25,14 @@ pub const module = Module { .prefix = "",
         Inst.init("mvBC", _mvBC);
 
     },
-};
+);
 
 pub fn _nop(state: State) Result {
     return END(state);
+}
+
+pub fn _illegal(state: State) Result {
+    return state.result(._illegal);
 }
 
 pub fn _sentinel(state: State) Result {

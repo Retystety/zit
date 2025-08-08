@@ -1,6 +1,13 @@
 const Config = @import("Config.zig");
 const Width = @import("width.zig").Width;
-const maxOpcode = @import("inst.zig").maxOpcode;
+
+const inst = @import("inst.zig");
+const Opcode = inst.Opcode;
+const maxOpcode = inst.maxOpcode;
+
+const Type = @import("std").builtin.Type;
+const EnumField = Type.EnumField;
+const Enum = Type.Enum;
 
 pub const Err = error {
     size,  
@@ -13,10 +20,8 @@ pub fn ISA(config: Config = Config {}) !type {
     };
 
     const size: usize = 0;
-    for (modules) |module| {
-        size += module.len;
-    }
+    for (modules) |module| { size += module.instrs.len; }
     if (size > maxOpcode) return Err.size;
 
-      
+    
 }

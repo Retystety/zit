@@ -3,14 +3,23 @@ const Module = @This();
 const inst = @import("inst.zig");
 const Inst = inst.Inst;
 const Opcode = inst.Opcode;
-const maxOpcode = inst.maxOpcode;
-const Memo = inst.Memo;
+const dt_size = inst.dt_size;
 const Operation = inst.Operation;
-const DTable = inst.DTable; 
+const DTable = inst.DTable;
+const EnumField = @import("std").builtin.Type.EnumField;
 
 prefix: []const u8,
 instrs: []const Inst,
 
-pub fn fmt(comptime prefix []const u8, comptime name: []const u8) []u8 {
-    return prefix ++ ins;
+pub const Err = error {
+    ModuleToBig,
+};
+
+pub fn init(prefix: []const u8, instrs: []const Inst) !Module {
+    if (instrs.len > maxOpcode) return 
+    return Module { .prefix = prefix, .instrs = instrs, };
+}
+
+pub fn enumFields(self: *const Module) []const EnumField {
+    
 }
