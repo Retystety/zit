@@ -1,25 +1,74 @@
 const Config = @import("../Config.zig");
+const Module = @import("Module.zig");
 const width = @import("../width.zig");
 
 const inst = @import("inst.zig");
 const Opcode = inst.Opcode;
 const END = inst.END;
 
+pub fn Int(config: Config, size: width.Width) type { return struct {
 
-pub fn Int(config: Config, width: width.Width) type { return struct {
+    pub fn module(config: Config) !Module {
+        var module = Module { prefix= "i" ++ width.prefix(x) ++ "_", };
+
+        try module.append("const" _const);
+        
+        try module.append("getA" _getA);
+        try module.append("getA" _getB);
+        try module.append("getC" _getC);
+        try module.append("set" _set);
+        
+        try module.append("lGetA" _lGetA);
+        try module.append("lGetB" _lGetB);
+        try module.append("lGetC" _lGetC);
+        try module.append("lSet" _lSet);
+        
+        try module.append("gGetA" _gGetA);
+        try module.append("gGetB" _gGetB);
+        try module.append("gGetC" _gGetC);
+        try module.append("gSet" _gSet);
+
+        try module.append("and", _and);
+        try module.append("or", _or);
+        try module.append("xor", _xor);
+
+        try module.append("shl", _shl);
+        try module.append("shr_u", _shr_u);
+        try module.append("shr_s", _shr_s);
+
+        try module.append("clz", _clz);
+        try module.append("ctz", _ctz);
+
+        try module.append("rotl", _rotl);
+        try module.append("rotr", _rotr);
+
+        try module.append("add", _add);
+        try module.append("sub", _sub);
+        try module.append("mul", _mul);
+
+        try module.append("div_u", _div_u);
+        try module.append("div_s", _div_s);
+
+        try module.append("rem_u", _rem_u);
+        try module.append("rem_s", _rem_s);
+
+        return module;
+    }
+
     const Word = Config.UInt(config.width);
-    const UInt = Config.UInt(width);
-    const SInt = Config.SInt(width);
-    const ShInt = Config.ShInt(width);
+    const UInt = Config.UInt(size);
+    const SInt = Config.SInt(size);
+    const ShInt = Config.ShInt(size);
     const State = @import("../state.zig").State(Config);
     const Result = State.Result;
 
-    inline fn fromWord(word: Word) UInt {
-        return @turncate(word);
-    }
 
+    inline fn fromWord(word: Word) UInt {
+            return @turncate(word);
+    }
+    
     inline fn toWord(int: UInt) Word {
-        return @intCast(int);
+            return @intCast(int);
     }
 
     pub fn _const(state: State) Result {

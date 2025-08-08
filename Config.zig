@@ -3,6 +3,9 @@ const Config = @This();
 const width = @import("width.zig");
 const Width = width.Width;
 
+const Module = @import("Module.zig");
+
+
 width: Width = .x32,
 float: bool = false,
 simd: bool = false,
@@ -23,7 +26,7 @@ pub fn Float(config: *const Config) type {
     if (config.float) f32 else void;
 }
 
-pub fn Double(config: Config) type {
+pub fn Double(config: *const Config) type {
     return if (config.float)
         switch (config.width) {
             .x32 => void,
@@ -31,3 +34,5 @@ pub fn Double(config: Config) type {
         }
     else void;
 }
+
+

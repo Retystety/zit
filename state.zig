@@ -4,7 +4,7 @@ const Opcode = inst.Opcode;
 const DTable = inst.DTable;
 const Memory =  @import("memory.zig").Memory;
 
-pub fn State(config: Config = Config .{}) type {
+pub fn State(config: Config) type {
     return struct {
         const State = @This();
 

@@ -1,5 +1,3 @@
 const Config = @import("Config.zig");
-const wasm = @import("std").wasm;
 
-
-
+pub fn ISA(config: Config = Config {}, modules: []const Module) !type {}
