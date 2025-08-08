@@ -8,52 +8,50 @@ const END = inst.END;
 
 pub fn Int(config: Config, size: width.Width) type { return struct {
 
-    pub fn module(config: Config) !Module {
-        var module = Module { prefix= "i" ++ width.prefix(x) ++ "_", };
+    pub const module = Module { .prefix = "i" ++ width.prefix(x) ++ "_", 
+        .instrs = [_]const Inst {
+            Inst.init("const" _const);
 
-        try module.append("const" _const);
-        
-        try module.append("getA" _getA);
-        try module.append("getA" _getB);
-        try module.append("getC" _getC);
-        try module.append("set" _set);
-        
-        try module.append("lGetA" _lGetA);
-        try module.append("lGetB" _lGetB);
-        try module.append("lGetC" _lGetC);
-        try module.append("lSet" _lSet);
-        
-        try module.append("gGetA" _gGetA);
-        try module.append("gGetB" _gGetB);
-        try module.append("gGetC" _gGetC);
-        try module.append("gSet" _gSet);
+            Inst.init("getA" _getA);
+            Inst.init("getA" _getB);
+            Inst.init("getC" _getC);
+            Inst.init("set" _set);
 
-        try module.append("and", _and);
-        try module.append("or", _or);
-        try module.append("xor", _xor);
+            Inst.init("lGetA" _lGetA);
+            Inst.init("lGetB" _lGetB);
+            Inst.init("lGetC" _lGetC);
+            Inst.init("lSet" _lSet);
 
-        try module.append("shl", _shl);
-        try module.append("shr_u", _shr_u);
-        try module.append("shr_s", _shr_s);
+            Inst.init("gGetA" _gGetA);
+            Inst.init("gGetB" _gGetB);
+            Inst.init("gGetC" _gGetC);
+            Inst.init("gSet" _gSet);
 
-        try module.append("clz", _clz);
-        try module.append("ctz", _ctz);
+            Inst.init("and", _and);
+            Inst.init("or", _or);
+            Inst.init("xor", _xor);
 
-        try module.append("rotl", _rotl);
-        try module.append("rotr", _rotr);
+            Inst.init("shl", _shl);
+            Inst.init("shr_u", _shr_u);
+            Inst.init("shr_s", _shr_s);
 
-        try module.append("add", _add);
-        try module.append("sub", _sub);
-        try module.append("mul", _mul);
+            Inst.init("clz", _clz);
+            Inst.init("ctz", _ctz);
 
-        try module.append("div_u", _div_u);
-        try module.append("div_s", _div_s);
+            Inst.init("rotl", _rotl);
+            Inst.init("rotr", _rotr);
 
-        try module.append("rem_u", _rem_u);
-        try module.append("rem_s", _rem_s);
+            Inst.init("add", _add);
+            Inst.init("sub", _sub);
+            Inst.init("mul", _mul);
 
-        return module;
-    }
+            Inst.init("div_u", _div_u);
+            Inst.init("div_s", _div_s);
+
+            Inst.init("rem_u", _rem_u);
+            Inst.init("rem_s", _rem_s);
+        },
+    };
 
     const Word = Config.UInt(config.width);
     const UInt = Config.UInt(size);
