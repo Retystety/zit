@@ -10,15 +10,15 @@ const Result = State.Result;
 
 pub const module = Module { .prefix = "",  
     .instrs = [_]const Inst {
-        Inst.init("nop" _nop);
-        Inst.init("sentinel" _sentinel);
-        Inst.init("breakepoint" _breakepoint);
-        Inst.init("unreachable" _unreachable);
-        Inst.init("mvCA" _mvCA);
-        Inst.init("mvCB" _mvCB);
-        Inst.init("swp" _swp);
-        Inst.init("mvAC" _mvAC);
-        Inst.init("mvBC" _mvBC);
+        Inst.init("nop", _nop);
+        Inst.init("sentinel", _sentinel);
+        Inst.init("breakepoint", _breakepoint);
+        Inst.init("unreachable", _unreachable);
+        Inst.init("mvCA", _mvCA);
+        Inst.init("mvCB", _mvCB);
+        Inst.init("swp", _swp);
+        Inst.init("mvAC", _mvAC);
+        Inst.init("mvBC", _mvBC);
 
     },
 };

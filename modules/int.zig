@@ -8,24 +8,24 @@ const END = inst.END;
 
 pub fn Int(config: Config, size: width.Width) type { return struct {
 
-    pub const module = Module { .prefix = "i" ++ width.prefix(x) ++ "_", 
+    pub const module = Module { .prefix = "i" ++ width.prefix(size) ++ "_", 
         .instrs = [_]const Inst {
             Inst.init("const" _const);
 
-            Inst.init("getA" _getA);
-            Inst.init("getA" _getB);
-            Inst.init("getC" _getC);
-            Inst.init("set" _set);
+            Inst.init("getA", _getA);
+            Inst.init("getA", _getB);
+            Inst.init("getC", _getC);
+            Inst.init("set", _set);
 
-            Inst.init("lGetA" _lGetA);
-            Inst.init("lGetB" _lGetB);
-            Inst.init("lGetC" _lGetC);
-            Inst.init("lSet" _lSet);
+            Inst.init("lGetA", _lGetA);
+            Inst.init("lGetB", _lGetB);
+            Inst.init("lGetC", _lGetC);
+            Inst.init("lSet", _lSet);
 
-            Inst.init("gGetA" _gGetA);
-            Inst.init("gGetB" _gGetB);
-            Inst.init("gGetC" _gGetC);
-            Inst.init("gSet" _gSet);
+            Inst.init("gGetA", _gGetA);
+            Inst.init("gGetB", _gGetB);
+            Inst.init("gGetC", _gGetC);
+            Inst.init("gSet", _gSet);
 
             Inst.init("and", _and);
             Inst.init("or", _or);
