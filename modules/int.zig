@@ -1,57 +1,62 @@
 const Config = @import("../Config.zig");
-const Module = @import("Module.zig");
+const Module = @import("../Module.zig");
 const width = @import("../width.zig");
 
-const inst = @import("inst.zig");
+const inst = @import("../inst.zig");
+const Inst = inst.Inst;
 const Opcode = inst.Opcode;
 const END = inst.END;
 
-pub fn Int(config: Config, size: width.Width) type { return struct {
 
-    pub const module = try Module.init("i" ++ width.prefix(size) ++ "_", 
-        [_]const Inst {
-            Inst.init("const" _const);
+pub fn module(config: Config, size: width.Width) !Module {
+    return Int(config, size).mkModule();
+}
 
-            Inst.init("getA", _getA);
-            Inst.init("getA", _getB);
-            Inst.init("getC", _getC);
-            Inst.init("set", _set);
+fn Int(config: Config, size: width.Width) type { return struct {
 
-            Inst.init("lGetA", _lGetA);
-            Inst.init("lGetB", _lGetB);
-            Inst.init("lGetC", _lGetC);
-            Inst.init("lSet", _lSet);
+    fn mkModule() !Module { 
+        return Module.init("i" ++ width.prefix(size) ++ "_", [_]Inst {
+            Inst.init("const", _const),
 
-            Inst.init("gGetA", _gGetA);
-            Inst.init("gGetB", _gGetB);
-            Inst.init("gGetC", _gGetC);
-            Inst.init("gSet", _gSet);
+            Inst.init("getA", _getA),
+            Inst.init("getA", _getB),
+            Inst.init("getC", _getC),
+            Inst.init("set", _set),
 
-            Inst.init("and", _and);
-            Inst.init("or", _or);
-            Inst.init("xor", _xor);
+            Inst.init("lGetA", _lGetA),
+            Inst.init("lGetB", _lGetB),
+            Inst.init("lGetC", _lGetC),
+            Inst.init("lSet", _lSet),
 
-            Inst.init("shl", _shl);
-            Inst.init("shr_u", _shr_u);
-            Inst.init("shr_s", _shr_s);
+            Inst.init("gGetA", _gGetA),
+            Inst.init("gGetB", _gGetB),
+            Inst.init("gGetC", _gGetC),
+            Inst.init("gSet", _gSet),
 
-            Inst.init("clz", _clz);
-            Inst.init("ctz", _ctz);
+            Inst.init("and", _and),
+            Inst.init("or", _or),
+            Inst.init("xor", _xor),
 
-            Inst.init("rotl", _rotl);
-            Inst.init("rotr", _rotr);
+            Inst.init("shl", _shl),
+            Inst.init("shr_u", _shr_u),
+            Inst.init("shr_s", _shr_s),
 
-            Inst.init("add", _add);
-            Inst.init("sub", _sub);
-            Inst.init("mul", _mul);
+            Inst.init("clz", _clz),
+            Inst.init("ctz", _ctz),
 
-            Inst.init("div_u", _div_u);
-            Inst.init("div_s", _div_s);
+            Inst.init("rotl", _rotl),
+            Inst.init("rotr", _rotr),
 
-            Inst.init("rem_u", _rem_u);
-            Inst.init("rem_s", _rem_s);
-        },
-    );
+            Inst.init("add", _add),
+            Inst.init("sub", _sub),
+            Inst.init("mul", _mul),
+
+            Inst.init("div_u", _div_u),
+            Inst.init("div_s", _div_s),
+
+            Inst.init("rem_u", _rem_u),
+            Inst.init("rem_s", _rem_s),
+        });
 
     const Word = Config.UInt(config.width);
     const UInt = Config.UInt(size);

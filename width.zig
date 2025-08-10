@@ -1,7 +1,7 @@
 const Width = enum {
     x32,
     x64,    
-}
+};
 
 pub fn prefix(width: Width) []u8 {
     return switch (width) {
@@ -37,7 +37,7 @@ pub fn ShInt(width: Width) type {
 
 pub fn sgnMask(Int: type) Int {
     var mask: Int = 1;
-    mask << @sizeOf(Int) - 1;
+    mask <<= @sizeOf(Int) - 1;
     return mask;
 } 
 

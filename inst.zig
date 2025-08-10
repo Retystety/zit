@@ -1,5 +1,5 @@
 const wasm = @import("std").wasm;
-const State = @import("State.zig");
+const State = @import("state.zig");
 const Result = State.Result;
 
 pub const Operation: type = *const fn(state: State) Result;
@@ -12,9 +12,9 @@ pub const Inst = struct {
     operation: Operation,
 
     pub fn init(name: []const u8, operation: Operation) Inst {
-        return Inst { .name = name, .operation = oeration, };
+        return Inst { .name = name, .operation = operation, };
     }
-}
+};
 
 pub inline fn END(state: State) Result {
     var new = state;

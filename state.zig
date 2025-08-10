@@ -1,4 +1,5 @@
 const Config = @import("Config.zig");
+const width = @import("width.zig");
 const inst = @import("inst.zig");
 const Opcode = inst.Opcode;
 const DTable = inst.DTable;
@@ -11,8 +12,6 @@ pub fn State(config: Config) type {
         const UWord = Config.UWord(config.width);
         const Float = Config.Float(config.float);
         const Double = Config.Double(config.float, config.width);
-
-        pub const Op = *const fn (state: State) Result;
            
         pub const Static = struct {
             globals: []u8,
@@ -93,7 +92,9 @@ pub fn State(config: Config) type {
             };
         }
 
-        pub fn init(code: []const Opcode, stack: []align(config.alignOf(UWord) u8), memory: Memory(Config), dtable: [*]usize) State {};
+        pub fn init(code: []const Opcode, stack: []align(width.alignOf(config.width)) u8, memory: Memory(Config), dtable: [*]usize) State {
+            return State {};
+        }
 
         pub inline fn ld(state: *const State, ptr: UWord, T: type) T {
             return state.static.memory.ld(ptr, T);

@@ -1,6 +1,6 @@
 const Config = @import("../Config.zig");
-const Module = @import("Module.zig");
-const inst = @import("inst.zig");
+const Module = @import("../Module.zig");
+const inst = @import("../inst.zig");
 const Inst = inst.Inst;
 const END = inst.END;
 
@@ -8,24 +8,23 @@ const State = @import("../state.zig").State(Config);
 const Result = State.Result;
 
 
-pub const module = try Module.init(prefix = "",  
-    .instrs = [_]const Inst {
-        Inst.init("nop", _nop);
+fn module() !Module {
+    return Module.init("", [_]Inst {             
+        Inst.init("nop", _nop),
         
-        Inst.init("illegal", _illegal);
-        Inst.init("sentinel", _sentinel);
+        Inst.init("illegal", _illegal),
+        Inst.init("sentinel", _sentinel),
         
-        Inst.init("breakepoint", _breakepoint);
-        Inst.init("unreachable", _unreachable);
+        Inst.init("breakepoint", _breakepoint),
+        Inst.init("unreachable", _unreachable),
         
-        Inst.init("mvCA", _mvCA);
-        Inst.init("mvCB", _mvCB);
-        Inst.init("swp", _swp);
-        Inst.init("mvAC", _mvAC);
-        Inst.init("mvBC", _mvBC);
-
-    },
-);
+        Inst.init("mvCA", _mvCA),
+        Inst.init("mvCB", _mvCB),
+        Inst.init("swp", _swp),
+        Inst.init("mvAC", _mvAC),
+        Inst.init("mvBC", _mvBC),
+    });
+}
 
 pub fn _nop(state: State) Result {
     return END(state);

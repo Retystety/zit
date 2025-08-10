@@ -1,7 +1,7 @@
 const Config = @This();
 
-const width = @import("width.zig");
-const Width = width.Width;
+const width_ns = @import("width.zig");
+const Width = width_ns.Width;
 
 width: Width = .x32,
 float: bool = false,
@@ -12,11 +12,11 @@ min_mem_size: u16 = 1,
 max_mem_size: u16 = 0, // 0 == inf
 
 pub fn UWord(config: *const Config) type {
-    return width.UInt(config.width);    
+    return width_ns.UInt(config.width);    
 }
 
 pub fn SWord(config: *const Config) type {
-    return width.SInt(config.width);
+    return width_ns.SInt(config.width);
 }
 
 pub fn Float(config: *const Config) type {

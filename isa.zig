@@ -1,4 +1,5 @@
 const Config = @import("Config.zig");
+const Module = @import("Module.zig");
 const Width = @import("width.zig").Width;
 
 const inst = @import("inst.zig");
@@ -9,19 +10,24 @@ const Type = @import("std").builtin.Type;
 const EnumField = Type.EnumField;
 const Enum = Type.Enum;
 
-pub const Err = error {
-    size,  
-};
+fn module(mod: Module.Err!Module) Module {
+    return mod catch @compileError("module to big");
+}
 
-pub fn ISA(config: Config = Config {}) !type {
+pub fn ISA(config: Config) type {
     const modules = [_]Module {
-        @import("base.zig").module,
-        @import("int.zig").Int(config, .x32).module;         
+        module("base", void),
+        module("int", .{ config, Width.x32, }),         
     };
 
-    const size: usize = 0;
-    for (modules) |module| { size += module.instrs.len; }
-    if (size > maxOpcode) return Err.size;
-
-    
+    return modules;
 }
+
+test "base module" {
+    _ = module(@import("modules/base.zig").module());
+}
+
+test "int module" {
+    _ = module(@import("modules/int.zig").module(Config {}, Width.x32));
+}
+
