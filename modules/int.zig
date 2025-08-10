@@ -1,20 +1,20 @@
 const Config = @import("../Config.zig");
-const Module = @import("../Module.zig");
 const width = @import("../width.zig");
 
-const inst = @import("../inst.zig");
-const Inst = inst.Inst;
-const Opcode = inst.Opcode;
-const END = inst.END;
-
-
-pub fn module(config: Config, size: width.Width) !Module {
+pub fn module(comptime config: Config, comptime size: width.Width) anytype {
     return Int(config, size).mkModule();
 }
 
-fn Int(config: Config, size: width.Width) type { return struct {
+fn Make(comptime config: Config, comptime size: width.Width) type { return struct {
+    const Module = @import("../module.zig").Module(config);
 
-    fn mkModule() !Module { 
+    const inst = @import("../inst.zig").inst(config);
+    const Inst = inst.Inst;
+    const Opcode = inst.Opcode;
+    const END = inst.END;
+        
+
+    fn module() !Module { 
         return Module.init("i" ++ width.prefix(size) ++ "_", [_]Inst {
             Inst.init("const", _const),
 

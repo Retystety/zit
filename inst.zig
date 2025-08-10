@@ -1,25 +1,20 @@
+const Config = @import("Config.zig");
 const wasm = @import("std").wasm;
-const State = @import("state.zig");
-const Result = State.Result;
 
-pub const Operation: type = *const fn(state: State) Result;
-pub const Opcode = u8;
-pub const dt_size: Opcode = 256;
-pub const Dtable: type = [dt_size]Operation;
+pub fn inst(comptime config: Config) type { return struct {
+    const State = @import("state.zig").State(config);
+    const Result = State.Result;
 
-pub const Inst = struct {
-    name: []const u8,
-    operation: Operation,
+    pub const Opcode = u8;
+    pub const dt_size: usize = 256;
+    pub const DTable: type = [dt_size]Operation;
 
-    pub fn init(name: []const u8, operation: Operation) Inst {
-        return Inst { .name = name, .operation = operation, };
-    }
-};
+    pub const Inst = struct {
+        name: []const u8,
+        operation: Operation,
 
-pub inline fn END(state: State) Result {
-    var new = state;
-    new.ip = @ptrFromInt(@intFromPtr(new.ip + @sizeOf(Opcode)));
-    const opcode = new.ip.*;
-    const op = state.static.dtable[opcode];
-    return @call(.always_tail, op, .{new});
-}
+        pub fn init(name: []const u8, operation: Operation) Inst {
+            return Inst { .name = name, .operation = operation, };
+        }
+    };
+};}

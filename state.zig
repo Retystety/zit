@@ -1,23 +1,35 @@
 const Config = @import("Config.zig");
 const width = @import("width.zig");
-const inst = @import("inst.zig");
-const Opcode = inst.Opcode;
-const DTable = inst.DTable;
-const Memory =  @import("memory.zig").Memory;
 
-pub fn State(config: Config) type {
+pub fn State(comptime config: Config) type {
     return struct {
-        const State = @This();
+        const Self  = @This();
 
-        const UWord = Config.UWord(config.width);
-        const Float = Config.Float(config.float);
-        const Double = Config.Double(config.float, config.width);
-           
+        const UWord = config.UWord();
+        const Float = config.Float();
+        const Double = config.Double();
+
+        const inst = @import("inst.zig").inst(config);
+        const Opcode = inst.Opcode;
+        const DTable = inst.DTable;
+        
+        const Memory =  @import("memory.zig").Memory(config);
+
+        pub const Operation: type = *const fn(state: Self) Self.Result;
+
+        pub inline fn END(state: State) Result {
+            var new = state;
+            new.ip = @ptrFromInt(@intFromPtr(new.ip + @sizeOf(Opcode)));
+            const opcode = new.ip.*;
+            const op = state.static.dtable[opcode];
+            return @call(.always_tail, op, .{new});
+        }
+            
         pub const Static = struct {
-            globals: []u8,
+            globals: []align(config.alignOf()) u8,
             stack_bgn: usize,
             stack_end: usize,
-            memory: Memory(config),
+            memory: Memory,
             dtable: DTable,
             fn_table: []UWord,
             jmp_table: []UWord,
@@ -57,7 +69,7 @@ pub fn State(config: Config) type {
             r_type: ResultType,
             payload: usize,
             
-            ip: IPtr,
+            ip: *const Opcode,
             
             ra: UWord,
             rb: UWord,
@@ -72,36 +84,36 @@ pub fn State(config: Config) type {
             dc: Double,
         };
         
-        pub fn result(state: State, r_type: ResultType) Result {
+        pub fn result(self: Self, r_type: ResultType) Result {
             return Result { 
                 .r_type = r_type,
-                .ip = state.ip,
+                .ip = self.ip,
                 
-                .ra = state.ra,
-                .rb = state.rb,
-                .rc = state.rc,
+                .ra = self.ra,
+                .rb = self.rb,
+                .rc = self.rc,
 
-                .fa = state.fa,
-                .fb = state.fb,
-                .fc = state.fc,
+                .fa = self.fa,
+                .fb = self.fb,
+                .fc = self.fc,
 
                 
-                .da = state.da,
-                .db = state.db,
-                .dc = state.dc,   
+                .da = self.da,
+                .db = self.db,
+                .dc = self.dc,   
             };
         }
 
-        pub fn init(code: []const Opcode, stack: []align(width.alignOf(config.width)) u8, memory: Memory(Config), dtable: [*]usize) State {
-            return State {};
-        }
+        // pub fn init(code: []const Opcode, stack: []align(config.alignOf()) u8, memory: Memory(config), dtable: [*]usize) Self {
+        //     return Self {};
+        // }
 
-        pub inline fn ld(state: *const State, ptr: UWord, T: type) T {
-            return state.static.memory.ld(ptr, T);
+        pub inline fn ld(self: *const Self, ptr: UWord, T: type) T {
+            return self.static.memory.ld(ptr, T);
         }
         
-        pub inline fn st(state: *const State, ptr: UWord, val: UWord) void {
-            return state.static.memory.st(ptr, val);
+        pub inline fn st(self: *const Self, ptr: UWord, val: UWord) void {
+            return self.static.memory.st(ptr, val);
         }
 
         pub const stackErr = error {
@@ -109,42 +121,42 @@ pub fn State(config: Config) type {
             overflow,
         };
 
-        pub inline fn pop(state: *State, len: usize) stackErr!void {
-            const sp = state.sp -| len;
-            if (sp <= state.static.stack_bgn) return stackErr.underflow;
-            state.sp = sp;
+        pub inline fn pop(self: *Self, len: usize) stackErr!void {
+            const sp = self.sp -| len;
+            if (sp <= self.static.stack_bgn) return stackErr.underflow;
+            self.sp = sp;
         }
 
-        pub inline fn push(state: *State, len: usize) stackErr!void {
-            const sp = state.sp +| len;
-            if (sp >= state.static.stack_endlow) return stackErr.overflow;
-            state.sp = sp;
+        pub inline fn push(self: *Self, len: usize) stackErr!void {
+            const sp = self.sp +| len;
+            if (sp >= self.static.stack_endlow) return stackErr.overflow;
+            self.sp = sp;
         }
 
-        pub inline fn get(state: *const State, ptr: UWord, T: type) T {
-            const ptr: *const T = @ptrFromInt(ptr); 
-            return ptr.*;
+        pub inline fn get(self: *const Self, ptr: UWord, T: type) T {
+            const _ptr: *const T = @ptrFromInt(self.sp - ptr); 
+            return _ptr.*;
         }
 
-        pub inline fn set(state: *const State, ptr: UWord, val: anyopaque) void {
-            const ptr: *T = @ptrFromInt(ptr);
-            ptr.* = val;
+        pub inline fn set(self: *const Self, ptr: UWord, val: anyopaque) void {
+            const _ptr: *val = @ptrFromInt(self.sp - ptr);
+            _ptr.* = val;
         }
         
-        pub inline fn lGet(state: *const State, off: UWord, T: type) T {
-            return state.get(state.sp - off, T); 
+        pub inline fn lGet(self: *const Self, off: UWord, T: type) T {
+            return self.get(self.sp - off, T); 
         }
         
-        pub inline fn lSet(state: *const State, off: UWord, val: anyopaque) void {
-            state.set(state.sp - off, val);
+        pub inline fn lSet(self: *const Self, off: UWord, val: anyopaque) void {
+            self.set(self.sp - off, val);
         }
 
-        pub inline fn gGet(state: *const State, ptr: UWord, T: type) T {
-            return state.static.memory.ld(ptr, T);
+        pub inline fn gGet(self: *const Self, ptr: UWord, T: type) T {
+            return self.static.memory.ld(ptr, T);
         }
         
-        pub inline fn gSet(state: *const State, ptr: UWord, val: anyopaque) void {
-            return state.static.memory.st(ptr, val);
+        pub inline fn gSet(self: *const Self, ptr: UWord, val: anyopaque) void {
+            return self.static.memory.st(ptr, val);
         }
     };
 }

@@ -1,4 +1,4 @@
-const Width = enum {
+pub const Width = enum {
     x32,
     x64,    
 };
@@ -24,7 +24,7 @@ pub fn SInt(width: Width) type {
     };
 }  
 
-pub fn alignOf(width: Width) type {
+pub fn alignOf(width: Width) usize {
     return @alignOf(UInt(width));
 }
 
