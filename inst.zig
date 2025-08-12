@@ -22,6 +22,7 @@ pub fn Inst(comptime State: type) type { return struct {
         const opcode_ptr: *const Opcode = @ptrFromInt(new.ip);
         const opcode = opcode_ptr.*;
         const op: Operation = @ptrFromInt(state.static.dtable[opcode]);
-        return @call(.always_tail, op, .{new});
+        //compiler bug
+        return @call(.auto, op, .{new});
     }
 };}
