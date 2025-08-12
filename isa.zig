@@ -10,23 +10,24 @@ pub fn ISA(comptime config: Config) type { return struct {
 
     const Module = @import("module.zig").Module(config);
 
-    const inst = @import("inst.zig").inst(config);
-    const Inst = inst.Inst;
-    const Opcode = inst.Opcode;
-    const dt_size = inst.dt_size;
-    const DTable = inst.DTable;
+    const State = @import("state.zig").State(config);
+    const Opcode = State.Opcode;
+    const dt_size = State.dt_size;
+    const DTable = State.DTable;
+
+    const Inst = @import("inst.zig").Inst(State);
 
     modules: []const Module,
 
-    //pub fn init() Self {}
+    //pub fn init(config: Config) Self {}
 
-    pub fn module(mod: Module.Err!Module) Module {
+    pub fn module(comptime mod: Module.Err!Module) Module {
         return mod catch @compileError("module to big");
     }
 };}
 
 test "base module" {
-    _ = ISA(Config {}).module(@import("modules/base.zig").make.module(Config {}));
+    _ = ISA(Config {}).module(@import("modules/base.zig").Make(Config {}).module());
 }
 
 //test "int module" {

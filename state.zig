@@ -4,26 +4,16 @@ const width = @import("width.zig");
 pub fn State(comptime config: Config) type {
     return struct {
         const Self  = @This();
+        
+        pub const Opcode = u8;
+        pub const dt_size: usize = 256;
+        pub const DTable: type = [dt_size]usize;
 
         const UWord = config.UWord();
         const Float = config.Float();
         const Double = config.Double();
-
-        const inst = @import("inst.zig").inst(config);
-        const Opcode = inst.Opcode;
-        const DTable = inst.DTable;
         
         const Memory =  @import("memory.zig").Memory(config);
-
-        pub const Operation: type = *const fn(state: Self) Self.Result;
-
-        pub inline fn END(state: State) Result {
-            var new = state;
-            new.ip = @ptrFromInt(@intFromPtr(new.ip + @sizeOf(Opcode)));
-            const opcode = new.ip.*;
-            const op = state.static.dtable[opcode];
-            return @call(.always_tail, op, .{new});
-        }
             
         pub const Static = struct {
             globals: []align(config.alignOf()) u8,
@@ -39,15 +29,15 @@ pub fn State(comptime config: Config) type {
         rb: UWord = 0,
         rc: UWord = 0,
 
-        fa: Float = 0,
-        fb: Float = 0,
-        fc: Float = 0,
+        fa: Float,
+        fb: Float,
+        fc: Float,
 
-        da: Double = 0,
-        db: Double = 0,
-        dc: Double = 0,
+        da: Double,
+        db: Double,
+        dc: Double,
 
-        ip: *const Opcode,
+        ip: usize,
         sp: usize,
         
         static: *Static,
@@ -67,9 +57,8 @@ pub fn State(comptime config: Config) type {
         
         pub const Result = struct {
             r_type: ResultType,
-            payload: usize,
             
-            ip: *const Opcode,
+            ip: usize,
             
             ra: UWord,
             rb: UWord,
@@ -87,6 +76,7 @@ pub fn State(comptime config: Config) type {
         pub fn result(self: Self, r_type: ResultType) Result {
             return Result { 
                 .r_type = r_type,
+                
                 .ip = self.ip,
                 
                 .ra = self.ra,

@@ -1,18 +1,16 @@
 const Config = @import("../Config.zig");
 
-fn Make(comptime config: Config) type { return struct {
+pub fn Make(comptime config: Config) type { return struct {
     const Module = @import("../module.zig").Module(config);
 
-    const State = @import("../state.zig").State(Config);
+    const State = @import("../state.zig").State(config);
     const Result = State.Result;
 
-    const inst = @import("../inst.zig").inst(config);
-    const Inst = inst.Inst;
-    const END = inst.END;
-    
+    const Inst = @import("../inst.zig").Inst(State);
+    const END = Inst.END;
 
-    fn module() !Module {
-        return Module.init("", [_]Inst {             
+    pub fn module() !Module {
+        return Module.init("", &[_]Inst {             
             Inst.init("nop", _nop),
             
             Inst.init("illegal", _illegal),
@@ -23,9 +21,14 @@ fn Make(comptime config: Config) type { return struct {
             
             Inst.init("mvCA", _mvCA),
             Inst.init("mvCB", _mvCB),
-            Inst.init("swp", _swp),
+
             Inst.init("mvAC", _mvAC),
             Inst.init("mvBC", _mvBC),
+            
+            Inst.init("mvAB", _mvAB),
+            Inst.init("mvBA", _mvBA),
+            Inst.init("swp", _swp),
+            
         });
     }
 
@@ -61,14 +64,6 @@ fn Make(comptime config: Config) type { return struct {
         return END(new);
     }
 
-    pub fn _swp(state: State) Result {
-        var new = state;
-        const t = new.ra;
-        new.ra = new.rb;
-        new.rb = t;
-        return END(new);
-    }
-
     pub fn _mvAC(state: State) Result {
         var new = state;
         new.rc = new.ra;
@@ -80,4 +75,25 @@ fn Make(comptime config: Config) type { return struct {
         new.rc = new.rb;
         return END(new);
     }
+
+    pub fn _mvAB(state: State) Result {
+        var new = state;
+        new.ra = new.rb;
+        return END(new);
+    }
+    
+    pub fn _mvBA(state: State) Result {
+        var new = state;
+        new.ra = new.rb;
+        return END(new);
+    }
+    
+    pub fn _swp(state: State) Result {
+        var new = state;
+        const t = new.ra;
+        new.ra = new.rb;
+        new.rb = t;
+        return END(new);
+    }
+    
 };}

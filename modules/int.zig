@@ -5,16 +5,22 @@ pub fn module(comptime config: Config, comptime size: width.Width) anytype {
     return Int(config, size).mkModule();
 }
 
-fn Make(comptime config: Config, comptime size: width.Width) type { return struct {
+pub fn Make(comptime config: Config, comptime size: width.Width) type { return struct {
     const Module = @import("../module.zig").Module(config);
 
-    const inst = @import("../inst.zig").inst(config);
-    const Inst = inst.Inst;
-    const Opcode = inst.Opcode;
-    const END = inst.END;
-        
+    const Word = Config.UInt(config.width);
+    const UInt = Config.UInt(size);
+    const SInt = Config.SInt(size);
+    const ShInt = Config.ShInt(size);
 
-    fn module() !Module { 
+    const State = @import("../state.zig").State(Config);
+    const Result = State.Result;
+    const Opcode = State.Opcode;
+
+    const Inst = @import().Inst;
+    const END = State.END;
+
+    pub fn module() !Module { 
         return Module.init("i" ++ width.prefix(size) ++ "_", [_]Inst {
             Inst.init("const", _const),
 
@@ -57,14 +63,6 @@ fn Make(comptime config: Config, comptime size: width.Width) type { return struc
             Inst.init("rem_u", _rem_u),
             Inst.init("rem_s", _rem_s),
         });
-
-    const Word = Config.UInt(config.width);
-    const UInt = Config.UInt(size);
-    const SInt = Config.SInt(size);
-    const ShInt = Config.ShInt(size);
-    const State = @import("../state.zig").State(Config);
-    const Result = State.Result;
-
 
     inline fn fromWord(word: Word) UInt {
             return @turncate(word);
